@@ -1,0 +1,118 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Description;
+using api_aguas.Models;
+
+namespace api_aguas.Controllers
+{
+    public class ReportTypesController : ApiController
+    {
+        private model_db db = new model_db();
+
+        // GET: api/ReportTypes/Read
+        [HttpGet]
+        [Route("api/ReportTypes/Read")]
+        public IQueryable<ReportType> ReadReportTypes()
+        {
+            return db.ReportTypes;
+        }
+
+        // GET: api/ReportTypes/Read/5
+        [HttpGet]
+        [Route("api/ReportTypes/Read/{id}")]
+        public IHttpActionResult ReadReportType(int id)
+        {
+            ReportType reportType = db.ReportTypes.Find(id);
+            if (reportType == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(reportType);
+        }
+
+        // POST: api/ReportTypes/Update
+        [HttpPost]
+        [Route("api/ReportTypes/Update")]
+        public IHttpActionResult UpdateReportType(ReportType reportType)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            db.Entry(reportType).State = EntityState.Modified;
+
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ReportTypeExists(reportType.IdReportType))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        // POST: api/ReportTypes/Create
+        [HttpPost]
+        [Route("api/ReportTypes/Create")]
+        public IHttpActionResult CreateReportType(ReportType reportType)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            db.ReportTypes.Add(reportType);
+            db.SaveChanges();
+
+            return CreatedAtRoute("DefaultApi", new { id = reportType.IdReportType }, reportType);
+        }
+
+        // POST: api/ReportTypes/Delete
+        [HttpPost]
+        [Route("api/ReportTypes/Delete")]
+        public IHttpActionResult DeleteReportType(ReportType reportType)
+        {
+            if (reportType == null)
+            {
+                return NotFound();
+            }
+
+            db.ReportTypes.Remove(reportType);
+            db.SaveChanges();
+
+            return Ok(reportType);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        private bool ReportTypeExists(int id)
+        {
+            return db.ReportTypes.Count(e => e.IdReportType == id) > 0;
+        }
+    }
+}

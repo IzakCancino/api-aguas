@@ -6,36 +6,37 @@ namespace api_aguas.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class user
+    public partial class User
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public user()
+        public User()
         {
-            reports = new HashSet<report>();
+            Reports = new HashSet<Report>();
+            IsEnabled = true;
         }
 
         [Key]
-        public int id_user { get; set; }
+        public int IdUser { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string u_name { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string last_name { get; set; }
+        public string LastName { get; set; }
 
         [Required]
         [StringLength(25)]
-        public string u_password { get; set; }
+        public string Password { get; set; }
 
         [Required]
-        [StringLength(50)]
-        public string email { get; set; }
+        [StringLength(320)]
+        public string Email { get; set; }
 
-        public bool is_enabled { get; set; }
+        public bool IsEnabled { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<report> reports { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
     }
 }

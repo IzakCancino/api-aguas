@@ -6,27 +6,40 @@ namespace api_aguas.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    public partial class report
+    public partial class Report
     {
+        public Report()
+        {
+            CreationDate = DateTime.Now;
+            ModificationDate = DateTime.Now;
+            Status = 1;
+        }
+
         [Key]
-        public int id_report { get; set; }
+        public int IdReport { get; set; }
 
-        public int id_report_type { get; set; }
+        public int IdReportType { get; set; }
 
-        public int id_user { get; set; }
+        public int IdUser { get; set; }
 
-        public decimal latitute { get; set; }
+        [Required]
+        public decimal Latitude { get; set; }
 
-        public decimal longitude { get; set; }
-
-        public DateTime r_timestamp { get; set; }
+        [Required]
+        public decimal Longitude { get; set; }
 
         [Required]
         [StringLength(300)]
-        public string r_description { get; set; }
+        public string Description { get; set; }
 
-        public virtual report_types report_types { get; set; }
+        public int Status { get; set; }
 
-        public virtual user user { get; set; }
+        public DateTime CreationDate { get; set; }
+
+        public DateTime ModificationDate { get; set; }
+
+        public virtual ReportType ReportType { get; set; }
+
+        public virtual User User { get; set; }
     }
 }

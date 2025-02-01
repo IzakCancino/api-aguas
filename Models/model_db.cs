@@ -12,33 +12,34 @@ namespace api_aguas.Models
         {
         }
 
-        public virtual DbSet<report_types> report_types { get; set; }
-        public virtual DbSet<report> reports { get; set; }
-        public virtual DbSet<user> users { get; set; }
+        public virtual DbSet<Organization> Organizations { get; set; }
+        public virtual DbSet<Report> Reports { get; set; }
+        public virtual DbSet<ReportType> ReportTypes { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<report_types>()
-                .Property(e => e.phone)
-                .IsFixedLength()
-                .IsUnicode(false);
-
-            modelBuilder.Entity<report_types>()
-                .HasMany(e => e.reports)
-                .WithRequired(e => e.report_types)
+            modelBuilder.Entity<Organization>()
+                .HasMany(e => e.ReportTypes)
+                .WithRequired(e => e.Organization)
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<report>()
-                .Property(e => e.latitute)
+            modelBuilder.Entity<Report>()
+                .Property(e => e.Latitude)
                 .HasPrecision(9, 6);
 
-            modelBuilder.Entity<report>()
-                .Property(e => e.longitude)
+            modelBuilder.Entity<Report>()
+                .Property(e => e.Longitude)
                 .HasPrecision(9, 6);
 
-            modelBuilder.Entity<user>()
-                .HasMany(e => e.reports)
-                .WithRequired(e => e.user)
+            modelBuilder.Entity<ReportType>()
+                .HasMany(e => e.Reports)
+                .WithRequired(e => e.ReportType)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<User>()
+                .HasMany(e => e.Reports)
+                .WithRequired(e => e.User)
                 .WillCascadeOnDelete(false);
         }
     }
