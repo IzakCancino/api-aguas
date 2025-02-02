@@ -77,7 +77,7 @@ namespace api_aguas.Controllers
         // POST: api/Users/Create
         [HttpPost]
         [Route("api/Users/Create")]
-        public IHttpActionResult PostUser(User user)
+        public IHttpActionResult CreateUser(User user)
         {
             if (!ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace api_aguas.Controllers
             db.Users.Add(user);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = user.IdUser }, user);
+            return Created($"api/Users/{user.IdUser}", user);
         }
 
         // POST: api/Users/Delete

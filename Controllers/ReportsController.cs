@@ -87,7 +87,7 @@ namespace api_aguas.Controllers
             db.Reports.Add(report);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = report.IdReport }, report);
+            return Created($"api/Reports/{report.IdReport}", report);
         }
 
         // POST: api/Reports/Delete

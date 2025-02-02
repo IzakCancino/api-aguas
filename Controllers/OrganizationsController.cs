@@ -87,7 +87,7 @@ namespace api_aguas.Controllers
             db.Organizations.Add(organization);
             db.SaveChanges();
 
-            return CreatedAtRoute("DefaultApi", new { id = organization.IdOrganization }, organization);
+            return Created($"api/Organizations/{organization.IdOrganization}", organization);
         }
 
         // POST: api/Organizations/Delete
