@@ -48,6 +48,11 @@ namespace api_aguas.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!db.Users.Any(x => x.IdUser == user.IdUser))
+            {
+                return BadRequest();
+            }
+
             db.Entry(user).State = EntityState.Modified;
 
             try

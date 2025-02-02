@@ -48,6 +48,11 @@ namespace api_aguas.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!db.ReportTypes.Any(x => x.IdReportType == reportType.IdReportType))
+            {
+                return BadRequest();
+            }
+
             db.Entry(reportType).State = EntityState.Modified;
 
             try
