@@ -24,6 +24,32 @@ namespace api_aguas.Controllers
             return db.Reports;
         }
 
+        // GET: api/Reports/Read
+        [HttpGet]
+        [Route("api/Reports/Read")]
+        public IQueryable<Report> ReadReports(int idReportType, int status, int daysAgo)
+        {
+            IQueryable<Report> reports = db.Reports;
+
+            if (idReportType > 0)
+            {
+                reports = reports.Where(x => x.IdReportType == idReportType);
+            }
+
+            if (status > 0)
+            {
+                reports = reports.Where(x => x.Status == status);
+            }
+
+            if (daysAgo > 0)
+            {               
+                DateTime thresholdDate = DateTime.Now.AddDays(-daysAgo);
+                reports = reports.Where(x => x.CreationDate >= thresholdDate);
+            }
+
+            return reports;
+        }
+
         // GET: api/Reports/Read/5
         [HttpGet]
         [Route("api/Reports/Read/{id}")]
