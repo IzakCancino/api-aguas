@@ -101,6 +101,14 @@ namespace api_aguas.Controllers
             return Ok(user);
         }
 
+        // POST: api/Users/Login
+        [HttpPost]
+        [Route("api/Users/Login")]
+        public bool Login(User user)
+        {
+            return db.Users.Any(x => x.Email == user.Email && x.Password == user.Password && x.IsEnabled);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
