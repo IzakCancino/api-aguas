@@ -19,9 +19,20 @@ namespace api_aguas.Controllers
         // GET: api/Organizations/Read
         [HttpGet]
         [Route("api/Organizations/Read")]
-        public IQueryable<Organization> ReadOrganizations()
+        public IHttpActionResult ReadOrganizations()
         {
-            return db.Organizations;
+            return Ok(db.Organizations.Select(x => new {
+                x.IdOrganization,
+                x.Name,
+                x.Phone,
+                x.Color,
+                x.IsMessageable,
+                ReportTypes = x.ReportTypes.Select(r => new 
+                {
+                    r.IdReportType,
+                    r.Name
+                })
+            }));
         }
 
         // GET: api/Organizations/Read/5
@@ -35,7 +46,18 @@ namespace api_aguas.Controllers
                 return NotFound();
             }
 
-            return Ok(organization);
+            return Ok(new {
+                organization.IdOrganization,
+                organization.Name,
+                organization.Phone,
+                organization.Color,
+                organization.IsMessageable,
+                ReportTypes = organization.ReportTypes.Select(r => new
+                {
+                    r.IdReportType,
+                    r.Name
+                })
+            });
         }
 
         // POST: api/Organizations/Update

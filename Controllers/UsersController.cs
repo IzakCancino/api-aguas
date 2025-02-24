@@ -20,9 +20,14 @@ namespace api_aguas.Controllers
         // GET: api/Users/Read
         [HttpGet]
         [Route("api/Users/Read")]
-        public IQueryable<User> ReadUsers()
+        public IHttpActionResult ReadUsers()
         {
-            return db.Users;
+            return Ok(db.Users.Select(x => new {
+                x.IdUser,
+                x.Name,
+                x.LastName,
+                x.IsEnabled
+            }));
         }
 
         // GET: api/Users/5
@@ -36,7 +41,12 @@ namespace api_aguas.Controllers
                 return NotFound();
             }
 
-            return Ok(user);
+            return Ok(new {
+                user.IdUser,
+                user.Name,
+                user.LastName,
+                user.IsEnabled
+            });
         }
 
         // POST: api/Users/Update
@@ -158,6 +168,47 @@ namespace api_aguas.Controllers
                 Success = true, 
                 Value = userFound.IdUser,
                 Message = "Inicio de sesión exitoso." 
+            });
+        }
+
+        // POST: api/Users/Historial
+        [HttpPost]
+        [Route("api/Users/Historial")]
+        public IHttpActionResult HistorialUser(User user)
+        {
+            if (!db.Users.Any(x => x.IdUser == user.IdUser && x.SessionToken == user.SessionToken))
+            {
+                return Json(new
+                {
+                    Success = false,
+                    Value = new List<Report> { },
+                    Message = "Historial de reportes no encontrado."
+                });
+            }
+
+            User userFound = db.Users.Find(user.IdUser);
+
+            return Ok(new {
+                userFound.IdUser,
+                Reports = userFound.Reports.Select(x => new {
+                    x.IdReport,
+                    x.Latitude,
+                    x.Longitude,
+                    x.Description,
+                    x.Status,
+                    x.CreationDate,
+                    x.ModificationDate,
+                    ReportType = new
+                    {
+                        x.ReportType.IdReportType,
+                        x.ReportType.Name,
+                        Organization = new
+                        {
+                            x.ReportType.Organization.IdOrganization,
+                            x.ReportType.Organization.Name
+                        }
+                    }
+                })
             });
         }
 

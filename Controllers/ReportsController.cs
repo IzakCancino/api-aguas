@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -19,15 +20,32 @@ namespace api_aguas.Controllers
         // GET: api/Reports/Read
         [HttpGet]
         [Route("api/Reports/Read")]
-        public IQueryable<Report> ReadReports()
+        public IHttpActionResult ReadReports()
         {
-            return db.Reports;
+            return Ok(db.Reports.Select(x => new {
+                x.IdReport,
+                x.Latitude,
+                x.Longitude,
+                x.Description,
+                x.Status,
+                x.CreationDate,
+                x.ModificationDate,
+                ReportType = new {
+                    x.ReportType.IdReportType,
+                    x.ReportType.Name,
+                    Organization = new
+                    {
+                        x.ReportType.Organization.IdOrganization,
+                        x.ReportType.Organization.Name
+                    }
+                }
+            }));
         }
 
         // GET: api/Reports/Read
         [HttpGet]
         [Route("api/Reports/Read")]
-        public IQueryable<Report> ReadReports(int idReportType, int status, int daysAgo)
+        public IHttpActionResult ReadReports(int idReportType, int status, int daysAgo)
         {
             IQueryable<Report> reports = db.Reports;
 
@@ -47,7 +65,25 @@ namespace api_aguas.Controllers
                 reports = reports.Where(x => x.CreationDate >= thresholdDate);
             }
 
-            return reports;
+            return Ok(reports.Select(x => new {
+                x.IdReport,
+                x.Latitude,
+                x.Longitude,
+                x.Description,
+                x.Status,
+                x.CreationDate,
+                x.ModificationDate,
+                ReportType = new
+                {
+                    x.ReportType.IdReportType,
+                    x.ReportType.Name,
+                    Organization = new
+                    {
+                        x.ReportType.Organization.IdOrganization,
+                        x.ReportType.Organization.Name
+                    }
+                }
+            }));
         }
 
         // GET: api/Reports/Read/5
@@ -61,7 +97,25 @@ namespace api_aguas.Controllers
                 return NotFound();
             }
 
-            return Ok(report);
+            return Ok(new {
+                report.IdReport,
+                report.Latitude,
+                report.Longitude,
+                report.Description,
+                report.Status,
+                report.CreationDate,
+                report.ModificationDate,
+                ReportType = new
+                {
+                    report.ReportType.IdReportType,
+                    report.ReportType.Name,
+                    Organization = new
+                    {
+                        report.ReportType.Organization.IdOrganization,
+                        report.ReportType.Organization.Name
+                    }
+                }
+            });
         }
 
         // POST: api/Reports/Update

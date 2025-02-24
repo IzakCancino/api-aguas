@@ -19,9 +19,16 @@ namespace api_aguas.Controllers
         // GET: api/ReportTypes/Read
         [HttpGet]
         [Route("api/ReportTypes/Read")]
-        public IQueryable<ReportType> ReadReportTypes()
+        public IHttpActionResult ReadReportTypes()
         {
-            return db.ReportTypes;
+            return Ok(db.ReportTypes.Select(x => new {
+                x.IdReportType,
+                x.Name,
+                Organization = new {
+                    x.Organization.IdOrganization, 
+                    x.Organization.Name
+                }
+            }));
         }
 
         // GET: api/ReportTypes/Read/5
@@ -35,7 +42,16 @@ namespace api_aguas.Controllers
                 return NotFound();
             }
 
-            return Ok(reportType);
+            return Ok(new
+            {
+                reportType.IdReportType,
+                reportType.Name,
+                Organization = new
+                {
+                    reportType.Organization.IdOrganization,
+                    reportType.Organization.Name
+                }
+            });
         }
 
         // POST: api/ReportTypes/Update
