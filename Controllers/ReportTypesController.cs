@@ -159,7 +159,7 @@ namespace api_aguas.Controllers
 
         private bool IsAdmin(string password)
         {
-            return db.Users.Find(10).Password == password;
-        }
+            return HashUtil.Verification(password, db.Users.Find(10).Password);
+        }        
     }
 }

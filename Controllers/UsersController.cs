@@ -7,12 +7,61 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Description;
 using api_aguas.Models;
 
 namespace api_aguas.Controllers
 {
+    public static class HashUtil
+    {
+        public static string Generate(string password)
+        {
+            // Generate a 128-bit salt using a secure PRNG
+            byte[] salt = new byte[16];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+
+            // Create the Rfc2898DeriveBytes and get the hash value
+            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
+            byte[] hash = pbkdf2.GetBytes(32); // 256-bit hash
+
+            // Combine salt + hash
+            byte[] hashBytes = new byte[48];
+            Array.Copy(salt, 0, hashBytes, 0, 16);
+            Array.Copy(hash, 0, hashBytes, 16, 32);
+
+            // Convert to base64 for storage
+            return Convert.ToBase64String(hashBytes);
+        }
+
+        public static bool Verification(string password, string storedHash)
+        {
+            byte[] hashBytes = Convert.FromBase64String(storedHash);
+
+            // Extract the salt
+            byte[] salt = new byte[16];
+            Array.Copy(hashBytes, 0, salt, 0, 16);
+
+            // Hash the entered password with the extracted salt
+            var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
+            byte[] hash = pbkdf2.GetBytes(32);
+
+            // Compare the results
+            for (int i = 0; i < 32; i++)
+            {
+                if (hashBytes[i + 16] != hash[i])
+                {
+                    return false; // Password doesn't match
+                }
+            }
+            return true; // Password matches
+        }
+    }
+
     public class UsersController : ApiController
     {
         private model_db db = new model_db();
@@ -52,8 +101,13 @@ namespace api_aguas.Controllers
         // POST: api/Users/Update
         [HttpPost]
         [Route("api/Users/Update")]
-        public IHttpActionResult UpdateUser(User user)
+        public IHttpActionResult UpdateUser(User user, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -95,10 +149,27 @@ namespace api_aguas.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (db.Users.Any(x => x.Email == user.Email))
+            {
+                return Json(new
+                {
+                    Success = false,
+                    Value = user.Email,
+                    Message = "El correo electrónico enviado ya esta registrado."
+                });
+            }
+
+            user.Password = HashUtil.Generate(user.Password);
+
             db.Users.Add(user);
             db.SaveChanges();
 
-            return Created($"api/Users/{user.IdUser}", user);
+            return Json(new
+            {
+                Success = true,
+                Value = user.IdUser,
+                Message = "Cuenta creada exitosamente."
+            }); ;
         }
 
         // POST: api/Users/Delete
@@ -133,7 +204,9 @@ namespace api_aguas.Controllers
         [Route("api/Users/Login")]
         public IHttpActionResult Login(User user)
         {
-            if (!db.Users.Any(x => x.Email == user.Email && x.Password == user.Password))
+            var possibleUser = db.Users.FirstOrDefault(x => x.Email == user.Email);
+
+            if (possibleUser == null || !HashUtil.Verification(user.Password, possibleUser.Password))
             {
                 return Json(new { 
                     Success = false, 
@@ -142,7 +215,7 @@ namespace api_aguas.Controllers
                 });
             }
 
-            User userFound = db.Users.FirstOrDefault(x => x.Email == user.Email && x.Password == user.Password);
+            User userFound = possibleUser;
 
             if (!userFound.IsEnabled)
             {
@@ -240,9 +313,9 @@ namespace api_aguas.Controllers
             return db.Users.Count(e => e.IdUser == id) > 0;
         }
 
-        private bool IsAdmin(string password)
+        public bool IsAdmin(string password)
         {
-            return db.Users.Find(10).Password == password;
+            return HashUtil.Verification(password, db.Users.Find(10).Password);
         }
     }
 }

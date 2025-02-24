@@ -28,7 +28,7 @@ namespace api_aguas.Models
         public string LastName { get; set; }
 
         [Required]
-        [StringLength(25)]
+        [StringLength(100)]
         public string Password { get; set; }
 
         [Required]
