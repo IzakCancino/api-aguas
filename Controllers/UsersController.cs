@@ -104,11 +104,22 @@ namespace api_aguas.Controllers
         // POST: api/Users/Delete
         [HttpPost]
         [Route("api/Users/Delete")]
-        public IHttpActionResult DeleteUser(User user)
+        public IHttpActionResult DeleteUser(int id, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
+            User user = db.Users.Find(id);
             if (user == null)
             {
                 return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             db.Users.Remove(user);
@@ -166,7 +177,10 @@ namespace api_aguas.Controllers
 
             return Json(new { 
                 Success = true, 
-                Value = userFound.IdUser,
+                Value = new { 
+                    userFound.IdUser, 
+                    userFound.SessionToken 
+                },
                 Message = "Inicio de sesión exitoso." 
             });
         }
@@ -174,7 +188,7 @@ namespace api_aguas.Controllers
         // POST: api/Users/Historial
         [HttpPost]
         [Route("api/Users/Historial")]
-        public IHttpActionResult HistorialUser(User user)
+        public IHttpActionResult UserHistorial(User user)
         {
             if (!db.Users.Any(x => x.IdUser == user.IdUser && x.SessionToken == user.SessionToken))
             {
@@ -224,6 +238,11 @@ namespace api_aguas.Controllers
         private bool UserExists(int id)
         {
             return db.Users.Count(e => e.IdUser == id) > 0;
+        }
+
+        private bool IsAdmin(string password)
+        {
+            return db.Users.Find(10).Password == password;
         }
     }
 }

@@ -63,8 +63,13 @@ namespace api_aguas.Controllers
         // POST: api/Organizations/Update
         [HttpPost]
         [Route("api/Organizations/Update")]
-        public IHttpActionResult UpdateOrganization(Organization organization)
+        public IHttpActionResult UpdateOrganization(Organization organization, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -99,8 +104,13 @@ namespace api_aguas.Controllers
         // POST: api/Organizations/Create
         [HttpPost]
         [Route("api/Organizations/Create")]
-        public IHttpActionResult CreateOrganization(Organization organization)
+        public IHttpActionResult CreateOrganization(Organization organization, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -115,11 +125,22 @@ namespace api_aguas.Controllers
         // POST: api/Organizations/Delete
         [HttpPost]
         [Route("api/Organizations/Delete")]
-        public IHttpActionResult DeleteOrganization(Organization organization)
+        public IHttpActionResult DeleteOrganization(int id, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
+            Organization organization = db.Organizations.Find(id);
             if (organization == null)
             {
                 return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             db.Organizations.Remove(organization);
@@ -140,6 +161,11 @@ namespace api_aguas.Controllers
         private bool OrganizationExists(int id)
         {
             return db.Organizations.Count(e => e.IdOrganization == id) > 0;
+        }
+        
+        private bool IsAdmin(string password)
+        {
+            return db.Users.Find(10).Password == password;
         }
     }
 }

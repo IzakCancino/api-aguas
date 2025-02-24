@@ -57,8 +57,13 @@ namespace api_aguas.Controllers
         // POST: api/ReportTypes/Update
         [HttpPost]
         [Route("api/ReportTypes/Update")]
-        public IHttpActionResult UpdateReportType(ReportType reportType)
+        public IHttpActionResult UpdateReportType(ReportType reportType, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -93,8 +98,13 @@ namespace api_aguas.Controllers
         // POST: api/ReportTypes/Create
         [HttpPost]
         [Route("api/ReportTypes/Create")]
-        public IHttpActionResult CreateReportType(ReportType reportType)
+        public IHttpActionResult CreateReportType(ReportType reportType, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -109,11 +119,22 @@ namespace api_aguas.Controllers
         // POST: api/ReportTypes/Delete
         [HttpPost]
         [Route("api/ReportTypes/Delete")]
-        public IHttpActionResult DeleteReportType(ReportType reportType)
+        public IHttpActionResult DeleteReportType(int id, string adminPassword)
         {
+            if (!IsAdmin(adminPassword))
+            {
+                return Unauthorized();
+            }
+
+            ReportType reportType = db.ReportTypes.Find(id);
             if (reportType == null)
             {
                 return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             db.ReportTypes.Remove(reportType);
@@ -134,6 +155,11 @@ namespace api_aguas.Controllers
         private bool ReportTypeExists(int id)
         {
             return db.ReportTypes.Count(e => e.IdReportType == id) > 0;
+        }
+
+        private bool IsAdmin(string password)
+        {
+            return db.Users.Find(10).Password == password;
         }
     }
 }

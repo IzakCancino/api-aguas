@@ -7,6 +7,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection.Emit;
 using System.Web.Http;
 using System.Web.Http.Description;
 using api_aguas.Models;
@@ -128,6 +129,11 @@ namespace api_aguas.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!IsLoggedIn(report.IdUser))
+            {
+                return Unauthorized();
+            }
+
             if (!db.Reports.Any(x => x.IdReport == report.IdReport))
             {
                 return BadRequest();
@@ -164,20 +170,36 @@ namespace api_aguas.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (!IsLoggedIn(report.IdUser))
+            {
+                return Unauthorized();
+            }
+
             db.Reports.Add(report);
             db.SaveChanges();
 
-            return Created($"api/Reports/{report.IdReport}", report);
+            return Ok(report.IdReport);
         }
 
         // POST: api/Reports/Delete
         [HttpPost]
         [Route("api/Reports/Delete")]
-        public IHttpActionResult DeleteReport(Report report)
+        public IHttpActionResult DeleteReport(int id)
         {
+            Report report = db.Reports.Find(id);
             if (report == null)
             {
                 return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!IsLoggedIn(report.IdUser))
+            {
+                return Unauthorized();
             }
 
             db.Reports.Remove(report);
@@ -198,6 +220,33 @@ namespace api_aguas.Controllers
         private bool ReportExists(int id)
         {
             return db.Reports.Count(e => e.IdReport == id) > 0;
+        }
+
+        private bool IsLoggedIn(int? checkIdUser = null)
+        {
+            try
+            {
+                // Token is in request header and formated as: IdUser + '/' + SessionToken
+                if (Request.Headers.GetValues("Authorization") == null)
+                {
+                    return false;
+                }
+
+                string token = Request.Headers.Authorization.Parameter ?? "0/0";
+                string[] s = token.Split('/');
+
+                if (!int.TryParse(s[0], out int id) || (checkIdUser != null && checkIdUser != id))
+                {
+                    return false;
+                }
+
+                User user = db.Users.Find(id);
+                return user.IsEnabled && user.SessionToken == s[1];
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }
