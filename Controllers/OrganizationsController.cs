@@ -165,7 +165,7 @@ namespace api_aguas.Controllers
         
         private bool IsAdmin(string password)
         {
-            return HashUtil.Verification(password, db.Users.Find(10).Password);
+            return HashUtil.Verification(password, db.Users.Find(1).Password);
         }
     }
 }
