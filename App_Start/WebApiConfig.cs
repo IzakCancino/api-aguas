@@ -1,4 +1,5 @@
-﻿using System;
+﻿using api_aguas.Filters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
@@ -13,6 +14,9 @@ namespace api_aguas
             // Web API configuration and services
             var cors = new EnableCorsAttribute("*", "*", "*");
             config.EnableCors(cors);
+
+            // Web API key default minimum level
+            config.Filters.Add(new ApiKeyAuthorizeAttribute { RequiredKey = "Any" });
 
             // Web API routes
             config.MapHttpAttributeRoutes();
