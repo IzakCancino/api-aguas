@@ -29,6 +29,18 @@ namespace api_aguas.Models
         public decimal Longitude { get; set; }
 
         [Required]
+        [StringLength(10)]
+        public string HouseNumber { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string Street { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string Neighborhood { get; set; }
+
+        [Required]
         [StringLength(300)]
         public string Description { get; set; }
 
