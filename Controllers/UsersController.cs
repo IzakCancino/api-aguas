@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.Description;
+using api_aguas.Filters;
 using api_aguas.Models;
 
 namespace api_aguas.Controllers
@@ -62,6 +63,7 @@ namespace api_aguas.Controllers
         }
     }
 
+    [ApiKeyAuthorize]
     public class UsersController : ApiController
     {
         private model_db db = new model_db();
@@ -99,15 +101,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/Users/Update
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/Users/Update")]
-        public IHttpActionResult UpdateUser(User user, string adminPassword)
+        public IHttpActionResult UpdateUser(User user)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -173,15 +171,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/Users/Delete
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/Users/Delete")]
-        public IHttpActionResult DeleteUser(int id, string adminPassword)
+        public IHttpActionResult DeleteUser(int id)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             User user = db.Users.Find(id);
             if (user == null)
             {
@@ -311,11 +305,6 @@ namespace api_aguas.Controllers
         private bool UserExists(int id)
         {
             return db.Users.Count(e => e.IdUser == id) > 0;
-        }
-
-        public bool IsAdmin(string password)
-        {
-            return HashUtil.Verification(password, db.Users.Find(1).Password);
         }
     }
 }

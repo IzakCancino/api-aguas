@@ -8,10 +8,12 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using api_aguas.Filters;
 using api_aguas.Models;
 
 namespace api_aguas.Controllers
 {
+    [ApiKeyAuthorize]
     public class ReportTypesController : ApiController
     {
         private model_db db = new model_db();
@@ -55,15 +57,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/ReportTypes/Update
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/ReportTypes/Update")]
-        public IHttpActionResult UpdateReportType(ReportType reportType, string adminPassword)
+        public IHttpActionResult UpdateReportType(ReportType reportType)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -96,15 +94,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/ReportTypes/Create
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/ReportTypes/Create")]
-        public IHttpActionResult CreateReportType(ReportType reportType, string adminPassword)
+        public IHttpActionResult CreateReportType(ReportType reportType)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -117,15 +111,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/ReportTypes/Delete
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/ReportTypes/Delete")]
-        public IHttpActionResult DeleteReportType(int id, string adminPassword)
+        public IHttpActionResult DeleteReportType(int id)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             ReportType reportType = db.ReportTypes.Find(id);
             if (reportType == null)
             {
@@ -156,10 +146,5 @@ namespace api_aguas.Controllers
         {
             return db.ReportTypes.Count(e => e.IdReportType == id) > 0;
         }
-
-        private bool IsAdmin(string password)
-        {
-            return HashUtil.Verification(password, db.Users.Find(1).Password);
-        }        
     }
 }

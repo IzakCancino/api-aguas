@@ -8,10 +8,12 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using api_aguas.Filters;
 using api_aguas.Models;
 
 namespace api_aguas.Controllers
 {
+    [ApiKeyAuthorize]
     public class OrganizationsController : ApiController
     {
         private model_db db = new model_db();
@@ -61,15 +63,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/Organizations/Update
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/Organizations/Update")]
-        public IHttpActionResult UpdateOrganization(Organization organization, string adminPassword)
+        public IHttpActionResult UpdateOrganization(Organization organization)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -102,15 +100,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/Organizations/Create
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/Organizations/Create")]
-        public IHttpActionResult CreateOrganization(Organization organization, string adminPassword)
+        public IHttpActionResult CreateOrganization(Organization organization)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -123,15 +117,11 @@ namespace api_aguas.Controllers
         }
 
         // POST: api/Organizations/Delete
+        [ApiKeyAuthorize(RequiredKey = "Administrator")]
         [HttpPost]
         [Route("api/Organizations/Delete")]
-        public IHttpActionResult DeleteOrganization(int id, string adminPassword)
+        public IHttpActionResult DeleteOrganization(int id)
         {
-            if (!IsAdmin(adminPassword))
-            {
-                return Unauthorized();
-            }
-
             Organization organization = db.Organizations.Find(id);
             if (organization == null)
             {
@@ -161,11 +151,6 @@ namespace api_aguas.Controllers
         private bool OrganizationExists(int id)
         {
             return db.Organizations.Count(e => e.IdOrganization == id) > 0;
-        }
-        
-        private bool IsAdmin(string password)
-        {
-            return HashUtil.Verification(password, db.Users.Find(1).Password);
         }
     }
 }

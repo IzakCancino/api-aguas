@@ -10,10 +10,12 @@ using System.Net.Http;
 using System.Reflection.Emit;
 using System.Web.Http;
 using System.Web.Http.Description;
+using api_aguas.Filters;
 using api_aguas.Models;
 
 namespace api_aguas.Controllers
 {
+    [ApiKeyAuthorize]
     public class ReportsController : ApiController
     {
         private model_db db = new model_db();
