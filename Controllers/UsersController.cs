@@ -296,6 +296,14 @@ namespace api_aguas.Controllers
             });
         }
 
+        // POST: api/Users/ConfirmCredentials
+        [HttpPost]
+        [Route("api/Users/ConfirmCredentials")]
+        public bool ConfirmCredentials(User user)
+        {
+            return db.Users.Any(x => x.IdUser == user.IdUser && x.SessionToken == user.SessionToken);
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
