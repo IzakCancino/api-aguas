@@ -27,8 +27,8 @@ namespace api_aguas.Models
         public string Phone { get; set; }
 
         [Required]
-        [StringLength(7)]
-        public string Color { get; set; }
+        [StringLength(15)]
+        public string Code { get; set; }
 
         public bool IsMessageable { get; set; }
 

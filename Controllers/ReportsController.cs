@@ -42,7 +42,8 @@ namespace api_aguas.Controllers
                     Organization = new
                     {
                         x.ReportType.Organization.IdOrganization,
-                        x.ReportType.Organization.Name
+                        x.ReportType.Organization.Name,
+                        x.ReportType.Organization.Code
                     }
                 }
             }));
@@ -51,13 +52,13 @@ namespace api_aguas.Controllers
         // GET: api/Reports/Read
         [HttpGet]
         [Route("api/Reports/Read")]
-        public IHttpActionResult ReadReports(int idReportType, int status, int daysAgo)
+        public IHttpActionResult ReadReports(int idOrganization, int status, int daysAgo)
         {
             IQueryable<Report> reports = db.Reports;
 
-            if (idReportType > 0)
+            if (idOrganization > 0)
             {
-                reports = reports.Where(x => x.IdReportType == idReportType);
+                reports = reports.Where(x => x.ReportType.Organization.IdOrganization == idOrganization);
             }
 
             if (status > 0)
@@ -89,7 +90,8 @@ namespace api_aguas.Controllers
                     Organization = new
                     {
                         x.ReportType.Organization.IdOrganization,
-                        x.ReportType.Organization.Name
+                        x.ReportType.Organization.Name,
+                        x.ReportType.Organization.Code
                     }
                 }
             }));
@@ -124,7 +126,8 @@ namespace api_aguas.Controllers
                     Organization = new
                     {
                         report.ReportType.Organization.IdOrganization,
-                        report.ReportType.Organization.Name
+                        report.ReportType.Organization.Name,
+                        report.ReportType.Organization.Code
                     }
                 }
             });

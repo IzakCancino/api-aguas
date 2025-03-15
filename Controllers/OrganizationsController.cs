@@ -27,7 +27,7 @@ namespace api_aguas.Controllers
                 x.IdOrganization,
                 x.Name,
                 x.Phone,
-                x.Color,
+                x.Code,
                 x.IsMessageable,
                 ReportTypes = x.ReportTypes.Select(r => new 
                 {
@@ -52,7 +52,7 @@ namespace api_aguas.Controllers
                 organization.IdOrganization,
                 organization.Name,
                 organization.Phone,
-                organization.Color,
+                organization.Code,
                 organization.IsMessageable,
                 ReportTypes = organization.ReportTypes.Select(r => new
                 {

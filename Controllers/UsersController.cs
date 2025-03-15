@@ -289,7 +289,8 @@ namespace api_aguas.Controllers
                         Organization = new
                         {
                             x.ReportType.Organization.IdOrganization,
-                            x.ReportType.Organization.Name
+                            x.ReportType.Organization.Name,
+                            x.ReportType.Organization.Code
                         }
                     }
                 })
